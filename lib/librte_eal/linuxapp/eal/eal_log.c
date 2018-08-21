@@ -22,6 +22,8 @@
 /*
  * default log function
  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
 static ssize_t
 console_log_write(__attribute__((unused)) void *c, const char *buf, size_t size)
 {
@@ -47,10 +49,7 @@ console_log_write(__attribute__((unused)) void *c, const char *buf, size_t size)
 
 	return ret;
 }
-
-static cookie_io_functions_t console_log_func = {
-	.write = console_log_write,
-};
+#pragma GCC diagnostic pop
 
 /*
  * set the log to default function, called during eal init process,
@@ -59,15 +58,9 @@ static cookie_io_functions_t console_log_func = {
 int
 rte_eal_log_init(const char *id, int facility)
 {
-	FILE *log_stream;
-
-	log_stream = fopencookie(NULL, "w+", console_log_func);
-	if (log_stream == NULL)
-		return -1;
-
 	openlog(id, LOG_NDELAY | LOG_PID, facility);
 
-	eal_log_set_default(log_stream);
+	eal_log_set_default(stdout);
 
 	return 0;
 }

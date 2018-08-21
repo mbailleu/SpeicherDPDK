@@ -83,7 +83,7 @@ rte_pci_map_device(struct rte_pci_device *dev)
 		}
 		break;
 	default:
-		RTE_LOG(DEBUG, EAL,
+		RTE_LOG(INFO, EAL,
 			"  Not managed by a supported kernel driver, skipped\n");
 		ret = 1;
 		break;

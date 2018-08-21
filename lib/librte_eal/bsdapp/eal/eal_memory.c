@@ -26,6 +26,7 @@ rte_mem_virt2phy(const void *virtaddr)
 {
 	/* XXX not implemented. This function is only used by
 	 * rte_mempool_virt2iova() when hugepages are disabled. */
+	printf("[%s:%d] %s\n", __FILE__, __LINE__, __func__);
 	(void)virtaddr;
 	return RTE_BAD_IOVA;
 }

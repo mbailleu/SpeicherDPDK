@@ -275,23 +275,25 @@ rte_pci_probe_one(const struct rte_pci_addr *addr)
 	/* update current pci device in global list, kernel bindings might have
 	 * changed since last time we looked at it.
 	 */
-	if (pci_update_device(addr) < 0)
+	if (pci_update_device(addr) < 0) 
 		goto err_return;
+	
 
 	FOREACH_DEVICE_ON_PCIBUS(dev) {
 		if (rte_pci_addr_cmp(&dev->addr, addr))
 			continue;
 
 		ret = pci_probe_all_drivers(dev);
-		if (ret)
+		if (ret) 
 			goto err_return;
+
 		return 0;
 	}
 	return -1;
 
 err_return:
 	RTE_LOG(WARNING, EAL,
-		"Requested device " PCI_PRI_FMT " cannot be used\n",
+		"Requested probe_one  device " PCI_PRI_FMT " cannot be used hello\n",
 		addr->domain, addr->bus, addr->devid, addr->function);
 	return -1;
 }
@@ -327,7 +329,7 @@ rte_pci_detach(const struct rte_pci_addr *addr)
 	return -1;
 
 err_return:
-	RTE_LOG(WARNING, EAL, "Requested device " PCI_PRI_FMT
+	RTE_LOG(WARNING, EAL, "Requested detach device " PCI_PRI_FMT
 			" cannot be used\n", dev->addr.domain, dev->addr.bus,
 			dev->addr.devid, dev->addr.function);
 	return -1;
@@ -361,8 +363,8 @@ rte_pci_probe(void)
 			devargs->policy == RTE_DEV_WHITELISTED)
 			ret = pci_probe_all_drivers(dev);
 		if (ret < 0) {
-			RTE_LOG(ERR, EAL, "Requested device " PCI_PRI_FMT
-				 " cannot be used\n", dev->addr.domain, dev->addr.bus,
+			RTE_LOG(ERR, EAL, "Requested probe device " PCI_PRI_FMT
+				 " cannot be used here\n", dev->addr.domain, dev->addr.bus,
 				 dev->addr.devid, dev->addr.function);
 			rte_errno = errno;
 			failed++;

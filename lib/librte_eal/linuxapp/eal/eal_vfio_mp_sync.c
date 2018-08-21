@@ -44,10 +44,10 @@
 			(chdr).cmsg_len = CMSGLEN;\
 			(chdr).cmsg_level = SOL_SOCKET;\
 			(chdr).cmsg_type = SCM_RIGHTS;\
-			memcpy((chdr).__cmsg_data, &(fd), sizeof(fd));\
+			memcpy(&(chdr) + sizeof((chdr)), &(fd), sizeof(fd));\
 		} while (0)
 #define CMSGHDR_TO_FD(chdr, fd) \
-			memcpy(&(fd), (chdr).__cmsg_data, sizeof(fd))
+			memcpy(&(fd), &(chdr) + sizeof((chdr)), sizeof(fd))
 
 static pthread_t socket_thread;
 static int mp_socket_fd;

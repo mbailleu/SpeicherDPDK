@@ -121,8 +121,11 @@ eal_thread_loop(__attribute__((unused)) void *arg)
 
 	ret = eal_thread_dump_affinity(cpuset, RTE_CPU_AFFINITY_STR_LEN);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
 	RTE_LOG(DEBUG, EAL, "lcore %u is ready (tid=%x;cpuset=[%s%s])\n",
 		lcore_id, (int)thread_id, cpuset, ret == 0 ? "" : "...");
+#pragma GCC diagnostic pop
 
 	/* read on our pipe to get commands */
 	while (1) {

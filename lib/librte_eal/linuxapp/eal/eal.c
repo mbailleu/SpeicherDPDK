@@ -842,7 +842,7 @@ rte_eal_init(int argc, char **argv)
 		}
 	}
 
-#ifdef VFIO_PRESENT
+#if defined(VFIO_PRESENT)
 	if (rte_eal_vfio_setup() < 0) {
 		rte_eal_init_alert("Cannot init VFIO\n");
 		rte_errno = EAGAIN;
@@ -890,9 +890,12 @@ rte_eal_init(int argc, char **argv)
 
 	ret = eal_thread_dump_affinity(cpuset, RTE_CPU_AFFINITY_STR_LEN);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
 	RTE_LOG(DEBUG, EAL, "Master lcore %u is ready (tid=%x;cpuset=[%s%s])\n",
 		rte_config.master_lcore, (int)thread_id, cpuset,
 		ret == 0 ? "" : "...");
+#pragma GCC diagnostic pop
 
 	if (rte_eal_intr_init() < 0) {
 		rte_eal_init_alert("Cannot init interrupt-handling thread\n");

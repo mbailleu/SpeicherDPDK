@@ -95,17 +95,17 @@ get_tsc_freq_arch(void)
 	 * Time Stamp Counter and Nominal Core Crystal Clock
 	 * Information Leaf
 	 */
-	maxleaf = __get_cpuid_max(0, NULL);
+	maxleaf = __wrap__get_cpuid_max(0, NULL);
 
 	if (maxleaf >= 0x15) {
-		__cpuid(0x15, a, b, c, d);
+		__wrap_cpuid(0x15, a, b, c, d);
 
 		/* EBX : TSC/Crystal ratio, ECX : Crystal Hz */
 		if (b && c)
 			return c * (b / a);
 	}
 
-	__cpuid(0x1, a, b, c, d);
+	__wrap_cpuid(0x1, a, b, c, d);
 	model = rte_cpu_get_model(a);
 
 	if (check_model_wsm_nhm(model))

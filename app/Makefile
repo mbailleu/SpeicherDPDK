@@ -3,7 +3,7 @@
 
 include $(RTE_SDK)/mk/rte.vars.mk
 
-DIRS-$(CONFIG_RTE_TEST_PMD) += test-pmd
+#DIRS-$(CONFIG_RTE_TEST_PMD) += test-pmd
 DIRS-$(CONFIG_RTE_PROC_INFO) += proc_info
 DIRS-$(CONFIG_RTE_LIBRTE_PDUMP) += pdump
 

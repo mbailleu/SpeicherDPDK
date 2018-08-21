@@ -63,36 +63,8 @@ static bool phys_addrs_available = true;
 
 #define RANDOMIZE_VA_SPACE_FILE "/proc/sys/kernel/randomize_va_space"
 
-static void
-test_phys_addrs_available(void)
-{
-	uint64_t tmp;
-	phys_addr_t physaddr;
-
-	if (!rte_eal_has_hugepages()) {
-		RTE_LOG(ERR, EAL,
-			"Started without hugepages support, physical addresses not available\n");
-		phys_addrs_available = false;
-		return;
-	}
-
-	physaddr = rte_mem_virt2phy(&tmp);
-	if (physaddr == RTE_BAD_PHYS_ADDR) {
-		if (rte_eal_iova_mode() == RTE_IOVA_PA)
-			RTE_LOG(ERR, EAL,
-				"Cannot obtain physical addresses: %s. "
-				"Only vfio will function.\n",
-				strerror(errno));
-		phys_addrs_available = false;
-	}
-}
-
-/*
- * Get physical address of any mapped virtual address in the current process.
- */
-phys_addr_t
-rte_mem_virt2phy(const void *virtaddr)
-{
+static phys_addr_t
+__rte_mem_virt2phy(const void * virtaddr) {
 	int fd, retval;
 	uint64_t page, physaddr;
 	unsigned long virt_pfn;
@@ -145,6 +117,53 @@ rte_mem_virt2phy(const void *virtaddr)
 	physaddr = ((page & 0x7fffffffffffffULL) * page_size)
 		+ ((unsigned long)virtaddr % page_size);
 
+	return physaddr;
+}
+
+static void
+test_phys_addrs_available(void)
+{
+	uint64_t tmp;
+	phys_addr_t physaddr;
+	
+
+	if (!rte_eal_has_hugepages()) {
+		RTE_LOG(ERR, EAL,
+			"Started without hugepages support, physical addresses not available\n");
+		phys_addrs_available = false;
+		return;
+	}
+	errno = 0;
+
+	physaddr = __rte_mem_virt2phy(&tmp);
+	if (physaddr == RTE_BAD_PHYS_ADDR) {
+		phys_addrs_available = false;
+		if (rte_eal_iova_mode() == RTE_IOVA_PA) {
+			if (errno != 0) {
+				RTE_LOG(ERR, EAL,
+					"Cannot obtain physical addresses: %s. "
+					"Only vfio will function.\n",
+					strerror(errno));
+			} else {
+				RTE_LOG(ERR, EAL,
+					"Cannot obtain physical address. No error given assume SGX enclave. virt(0x%lx) phys(0x%lx)\n", tmp, physaddr);
+				phys_addrs_available = true;
+			}
+		}
+	}
+}
+
+/*
+ * Get physical address of any mapped virtual address in the current process.
+ */
+phys_addr_t
+rte_mem_virt2phy(const void *virtaddr)
+{
+	phys_addr_t physaddr = __rte_mem_virt2phy(virtaddr);
+	if (physaddr == RTE_BAD_IOVA) {
+		RTE_LOG(ERR, EAL, "[%s:%d] %s: Couldn't resolve addr %p got 0x%lx. This could be due to the overriding of the test, for SGX enclaves\n",
+			__FILE__, __LINE__, __func__, virtaddr, physaddr);
+	}
 	return physaddr;
 }
 
@@ -1000,6 +1019,8 @@ rte_eal_hugepage_init(void)
 	int i, j, new_memseg;
 	int nr_hugefiles, nr_hugepages = 0;
 	void *addr;
+	
+	RTE_LOG(ERR, EAL, "%s: %s\n", __func__, strerror(errno));
 
 	test_phys_addrs_available();
 
@@ -1347,6 +1368,8 @@ rte_eal_hugepage_attach(void)
 		RTE_LOG(WARNING, EAL, "   This may cause issues with mapping memory "
 				"into secondary processes\n");
 	}
+	
+	RTE_LOG(ERR, EAL, "%s: %s\n", __func__, strerror(errno));
 
 	test_phys_addrs_available();
 

@@ -23,6 +23,9 @@ extern int rte_cycles_vmware_tsc_map;
 static inline uint64_t
 rte_rdtsc(void)
 {
+#if defined(SCONE)
+    return 0;
+#endif //SCONE
 	union {
 		uint64_t tsc_64;
 		RTE_STD_C11
@@ -46,6 +49,7 @@ rte_rdtsc(void)
 	asm volatile("rdtsc" :
 		     "=a" (tsc.lo_32),
 		     "=d" (tsc.hi_32));
+	
 	return tsc.tsc_64;
 }
 

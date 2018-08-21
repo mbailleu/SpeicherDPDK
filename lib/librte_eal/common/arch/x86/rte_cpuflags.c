@@ -121,6 +121,35 @@ const struct feature_entry rte_cpu_feature_table[] = {
 	FEAT_DEF(INVTSC, 0x80000007, 0, RTE_REG_EDX,  8)
 };
 
+/*#if defined(SCONE)
+
+#define __get_cpuid_max(a, b) 0x80000000
+
+#if defined(__cpuid_count)
+#undef __cpuid_count
+#define __cpuid_lookup_err(level, count) \
+    do {\
+        fprintf(stderr, "Could not find cpuid lookup for level: %u count: %u\n", level, count);\
+        exit(1);\
+    } while(0)
+
+#define __cpuid_count_value(level, count) \
+       ((uint64_t)(level) << 32) | (count)
+
+#define __cpuid_case(level, count, a, _a, b,  _b, c, _c, d, _d) \
+        case __cpuid_count_value(level, count): a = _a; b = _b; c = _c; d = _d; break;
+
+#define __cpuid_count(level, count, a, b, c, d) \
+        do {\
+            switch(__cpuid_count_value(level, count)) {\
+                __cpuid_case(1, 0, a, 0x506e3, b, 0x5100800, c, 0x7ffafbff, d, 0xbfebfbff) \
+                __cpuid_case(7, 0, a, 0x0, b, 0x29c6fbf, c, 0x0, d, 0x0) \
+                default:    __cpuid_lookup_err(level, count);\
+            }\
+        } while(0)
+#endif //__cpuid_count
+#endif //SCONE*/
+
 int
 rte_cpu_get_flag_enabled(enum rte_cpu_flag_t feature)
 {
@@ -138,12 +167,12 @@ rte_cpu_get_flag_enabled(enum rte_cpu_flag_t feature)
 		/* This entry in the table wasn't filled out! */
 		return -EFAULT;
 
-	maxleaf = __get_cpuid_max(feat->leaf & 0x80000000, NULL);
+	maxleaf = __wrap__get_cpuid_max(feat->leaf & 0x80000000, NULL);
 
 	if (maxleaf < feat->leaf)
 		return 0;
 
-	 __cpuid_count(feat->leaf, feat->subleaf,
+	 __wrap_cpuid_count(feat->leaf, feat->subleaf,
 			 regs[RTE_REG_EAX], regs[RTE_REG_EBX],
 			 regs[RTE_REG_ECX], regs[RTE_REG_EDX]);
 

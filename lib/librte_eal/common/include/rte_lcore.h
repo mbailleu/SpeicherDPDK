@@ -11,6 +11,7 @@
  * API for lcore and socket manipulation
  *
  */
+#include <sched.h>
 #include <rte_config.h>
 #include <rte_per_lcore.h>
 #include <rte_eal.h>

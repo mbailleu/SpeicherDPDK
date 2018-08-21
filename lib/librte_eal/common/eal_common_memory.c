@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
 #include <inttypes.h>
 #include <sys/mman.h>
 #include <sys/queue.h>

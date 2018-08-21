@@ -109,9 +109,9 @@ pci_uio_map_resource(struct rte_pci_device *dev)
 
 		ret = pci_uio_map_resource_by_index(dev, i,
 				uio_res, map_idx);
-		if (ret)
+		if (ret) {
 			goto error;
-
+		}
 		map_idx++;
 	}
 

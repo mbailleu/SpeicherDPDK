@@ -35,8 +35,13 @@
 
 #ifdef VFIO_PRESENT
 
+#if !defined(PAGE_SIZE)
 #define PAGE_SIZE   (sysconf(_SC_PAGESIZE))
+#endif
+
+#if !defined(PAGE_MASK)
 #define PAGE_MASK   (~(PAGE_SIZE - 1))
+#endif
 
 static struct rte_tailq_elem rte_vfio_tailq = {
 	.name = "VFIO_RESOURCE_LIST",
