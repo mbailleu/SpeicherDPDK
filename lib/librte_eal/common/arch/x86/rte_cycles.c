@@ -86,6 +86,7 @@ check_model_gdm_dnv(uint8_t model)
 uint64_t
 get_tsc_freq_arch(void)
 {
+#if 0
 	uint64_t tsc_hz = 0;
 	uint32_t a, b, c, d, maxleaf;
 	uint8_t mult, model;
@@ -120,4 +121,6 @@ get_tsc_freq_arch(void)
 		return 0;
 
 	return ((tsc_hz >> 8) & 0xff) * mult * 1E6;
+#endif
+  return 3600000000;
 }

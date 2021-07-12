@@ -468,6 +468,7 @@ static int
 #endif
 igbuio_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
+  RTE_LOG(INFO, EAL, "%s\n", __func__);
 	struct rte_uio_pci_dev *udev;
 	dma_addr_t map_dma_addr;
 	void *map_addr;

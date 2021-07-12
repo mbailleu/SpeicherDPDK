@@ -11,6 +11,8 @@
 #include <sys/ioctl.h>
 #include <rte_branch_prediction.h>
 
+#include "scone.h"
+
 /* Global variable containing revision id (even on non-control plane systems
  * where CCSR isn't available).
  */
@@ -338,7 +340,7 @@ int qman_global_init(void)
 		return ccsr_map_fd;
 	}
 
-	qman_ccsr_map = mmap(NULL, regs_size, PROT_READ | PROT_WRITE,
+	qman_ccsr_map = scone_kernel_mmap(NULL, regs_size, PROT_READ | PROT_WRITE,
 			     MAP_SHARED, ccsr_map_fd, phys_addr);
 	if (qman_ccsr_map == MAP_FAILED) {
 		pr_err("Can not map qman ccsr base\n");

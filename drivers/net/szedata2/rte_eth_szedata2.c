@@ -54,6 +54,7 @@
 
 #include "rte_eth_szedata2.h"
 #include "szedata2_iobuf.h"
+#include "scone.h"
 
 #define RTE_ETH_SZEDATA2_MAX_RX_QUEUES 32
 #define RTE_ETH_SZEDATA2_MAX_TX_QUEUES 32
@@ -1549,7 +1550,7 @@ rte_szedata2_eth_dev_init(struct rte_eth_dev *dev)
 		return -EINVAL;
 	}
 
-	pci_resource_ptr = mmap(0,
+	pci_resource_ptr = scone_kernel_mmap(0,
 			pci_dev->mem_resource[PCI_RESOURCE_NUMBER].len,
 			PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	close(fd);
@@ -1633,6 +1634,7 @@ static const struct rte_pci_id rte_szedata2_pci_id_table[] = {
 static int szedata2_eth_pci_probe(struct rte_pci_driver *pci_drv __rte_unused,
 	struct rte_pci_device *pci_dev)
 {
+  RTE_LOG(INFO, EAL, "%s\n", __func__);
 	return rte_eth_dev_pci_generic_probe(pci_dev,
 		sizeof(struct pmd_internals), rte_szedata2_eth_dev_init);
 }

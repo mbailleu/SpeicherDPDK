@@ -40,6 +40,7 @@
 #include "mlx5_autoconf.h"
 #include "mlx5_defs.h"
 #include "mlx5_glue.h"
+#include "scone.h"
 
 /* Device parameter to enable RX completion queue compression. */
 #define MLX5_RXQ_CQE_COMP_EN "rxq_cqe_comp_en"
@@ -497,7 +498,7 @@ priv_uar_init_primary(struct priv *priv)
 	/* keep distance to hugepages to minimize potential conflicts. */
 	addr = RTE_PTR_SUB(addr, MLX5_UAR_OFFSET + MLX5_UAR_SIZE);
 	/* anonymous mmap, no real memory consumption. */
-	addr = mmap(addr, MLX5_UAR_SIZE,
+	addr = scone_kernel_mmap(addr, MLX5_UAR_SIZE,
 		    PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (addr == MAP_FAILED) {
 		ERROR("Failed to reserve UAR address space, please adjust "
@@ -536,7 +537,7 @@ priv_uar_init_secondary(struct priv *priv)
 		return 0;
 	}
 	/* anonymous mmap, no real memory consumption. */
-	addr = mmap(priv->uar_base, MLX5_UAR_SIZE,
+	addr = scone_kernel_mmap(priv->uar_base, MLX5_UAR_SIZE,
 		    PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (addr == MAP_FAILED) {
 		ERROR("UAR mmap failed: %p size: %llu",
@@ -573,6 +574,7 @@ priv_uar_init_secondary(struct priv *priv)
 static int
 mlx5_pci_probe(struct rte_pci_driver *pci_drv, struct rte_pci_device *pci_dev)
 {
+  RTE_LOG(INFO, EAL, "%s\n", __func__);
 	struct ibv_device **list;
 	struct ibv_device *ibv_dev;
 	int err = 0;

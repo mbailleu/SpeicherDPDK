@@ -22,6 +22,7 @@
 #include <rte_common.h>
 
 #include "rte_pci.h"
+#include "scone.h"
 
 static inline const char *
 get_u8_pciaddr_field(const char *in, void *_u8, char dlm)
@@ -150,17 +151,21 @@ pci_map_resource(void *requested_addr, int fd, off_t offset, size_t size,
 		 int additional_flags)
 {
 	void *mapaddr;
+	if (fd < 0) {
+	  RTE_LOG(DEBUG, EAL, "%s(): file descriptor is negative\n", __func__);
+  }
 
 	/* Map the PCI memory resource of device */
-	mapaddr = mmap(requested_addr, size, PROT_READ | PROT_WRITE,
+	mapaddr = scone_kernel_mmap(requested_addr, size, PROT_READ | PROT_WRITE,
 			MAP_SHARED | additional_flags, fd, offset);
 	if (mapaddr == MAP_FAILED) {
 		RTE_LOG(ERR, EAL, "%s(): cannot mmap(%d, %p, 0x%lx, 0x%lx): %s (%p)\n",
 			__func__, fd, requested_addr,
 			(unsigned long)size, (unsigned long)offset,
 			strerror(errno), mapaddr);
-	} else
-		RTE_LOG(DEBUG, EAL, "  PCI memory mapped at %p\n", mapaddr);
+	} else {
+	  RTE_LOG(INFO, EAL, "  PCI memory mapped at %p\n", mapaddr);
+  }
 
 	return mapaddr;
 }

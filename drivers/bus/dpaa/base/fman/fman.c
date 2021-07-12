@@ -14,6 +14,8 @@
 #include <of.h>
 #include <rte_dpaa_logs.h>
 
+#include "scone.h"
+
 #define QMI_PORT_REGS_OFFSET		0x400
 
 /* CCSR map address to access ccsr based register */
@@ -70,7 +72,7 @@ fman_get_ip_rev(const struct device_node *fman_node)
 		pr_err("of_translate_address failed\n");
 		return -EINVAL;
 	}
-	fman_ccsr_map = mmap(NULL, regs_size, PROT_READ | PROT_WRITE,
+	fman_ccsr_map = scone_kernel_mmap(NULL, regs_size, PROT_READ | PROT_WRITE,
 			     MAP_SHARED, fman_ccsr_map_fd, phys_addr);
 	if (fman_ccsr_map == MAP_FAILED) {
 		pr_err("Can not map FMan ccsr base");
@@ -212,7 +214,7 @@ fman_if_init(const struct device_node *dpa_node)
 			 mname, regs_addr);
 		goto err;
 	}
-	__if->ccsr_map = mmap(NULL, __if->regs_size,
+	__if->ccsr_map = scone_kernel_mmap(NULL, __if->regs_size,
 			      PROT_READ | PROT_WRITE, MAP_SHARED,
 			      fman_ccsr_map_fd, phys_addr);
 	if (__if->ccsr_map == MAP_FAILED) {
@@ -359,7 +361,7 @@ fman_if_init(const struct device_node *dpa_node)
 			 mname, regs_addr);
 		goto err;
 	}
-	__if->bmi_map = mmap(NULL, __if->regs_size,
+	__if->bmi_map = scone_kernel_mmap(NULL, __if->regs_size,
 				 PROT_READ | PROT_WRITE, MAP_SHARED,
 				 fman_ccsr_map_fd, phys_addr);
 	if (__if->bmi_map == MAP_FAILED) {

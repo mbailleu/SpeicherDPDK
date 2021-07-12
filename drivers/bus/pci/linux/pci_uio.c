@@ -25,6 +25,7 @@
 
 #include "eal_filesystem.h"
 #include "pci_init.h"
+#include "scone.h"
 
 void *pci_map_addr = NULL;
 
@@ -323,6 +324,7 @@ pci_uio_map_resource_by_index(struct rte_pci_device *dev, int res_idx,
 	mapaddr = pci_map_resource(pci_map_addr, fd, 0,
 			(size_t)dev->mem_resource[res_idx].len, 0);
 	close(fd);
+	RTE_LOG(INFO, EAL, "%s:%d mapaddr(%p) pci_map_addr(%p)\n", __func__, __LINE__, mapaddr, pci_map_addr);
 	if (mapaddr == MAP_FAILED)
 		goto error;
 
@@ -435,7 +437,7 @@ pci_uio_ioport_map(struct rte_pci_device *dev, int bar,
 			strerror(errno));
 		goto error;
 	}
-	addr = mmap(NULL, end_addr + 1, PROT_READ | PROT_WRITE,
+	addr = scone_kernel_mmap(NULL, end_addr + 1, PROT_READ | PROT_WRITE,
 		MAP_SHARED, fd, 0);
 	close(fd);
 	if (addr == MAP_FAILED) {

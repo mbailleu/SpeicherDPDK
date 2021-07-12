@@ -24,6 +24,8 @@
 #include <unistd.h>
 #include <poll.h>
 
+#include "scone.h"
+
 #define ETH_AF_PACKET_IFACE_ARG		"iface"
 #define ETH_AF_PACKET_NUM_Q_ARG		"qpairs"
 #define ETH_AF_PACKET_BLOCKSIZE_ARG	"blocksz"
@@ -701,7 +703,7 @@ rte_pmd_init_internals(struct rte_vdev_device *dev,
 		rx_queue = &((*internals)->rx_queue[q]);
 		rx_queue->framecount = req->tp_frame_nr;
 
-		rx_queue->map = mmap(NULL, 2 * req->tp_block_size * req->tp_block_nr,
+		rx_queue->map = scone_kernel_mmap(NULL, 2 * req->tp_block_size * req->tp_block_nr,
 				    PROT_READ | PROT_WRITE, MAP_SHARED | MAP_LOCKED,
 				    qsockfd, 0);
 		if (rx_queue->map == MAP_FAILED) {
@@ -923,6 +925,7 @@ rte_eth_from_packet(struct rte_vdev_device *dev,
 static int
 rte_pmd_af_packet_probe(struct rte_vdev_device *dev)
 {
+  RTE_LOG(INFO, EAL, "%s\n", __func__);
 	int ret = 0;
 	struct rte_kvargs *kvlist;
 	int sockfd = -1;

@@ -12,6 +12,8 @@
 #include "bman_priv.h"
 #include <sys/ioctl.h>
 
+#include "scone.h"
+
 /*
  * Global variables of the max portal/pool number this bman version supported
  */
@@ -157,7 +159,7 @@ int bman_init_ccsr(const struct device_node *node)
 		return ccsr_map_fd;
 	}
 
-	bman_ccsr_map = mmap(NULL, regs_size, PROT_READ |
+	bman_ccsr_map = scone_kernel_mmap(NULL, regs_size, PROT_READ |
 			     PROT_WRITE, MAP_SHARED, ccsr_map_fd, phys_addr);
 	if (bman_ccsr_map == MAP_FAILED) {
 		pr_err("Can not map BMan CCSR base Bman: "

@@ -167,12 +167,12 @@ rte_cpu_get_flag_enabled(enum rte_cpu_flag_t feature)
 		/* This entry in the table wasn't filled out! */
 		return -EFAULT;
 
-	maxleaf = __wrap__get_cpuid_max(feat->leaf & 0x80000000, NULL);
+	maxleaf = __get_cpuid_max(feat->leaf & 0x80000000, NULL);
 
 	if (maxleaf < feat->leaf)
 		return 0;
 
-	 __wrap_cpuid_count(feat->leaf, feat->subleaf,
+	 __cpuid_count(feat->leaf, feat->subleaf,
 			 regs[RTE_REG_EAX], regs[RTE_REG_EBX],
 			 regs[RTE_REG_ECX], regs[RTE_REG_EDX]);
 

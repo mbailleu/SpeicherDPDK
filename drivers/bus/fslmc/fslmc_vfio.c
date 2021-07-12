@@ -37,6 +37,7 @@
 
 #include "portal/dpaa2_hw_pvt.h"
 #include "portal/dpaa2_hw_dpio.h"
+#include "scone.h"
 
 #define FSLMC_VFIO_LOG(level, fmt, args...) \
 	RTE_LOG(level, EAL, fmt "\n", ##args)
@@ -176,7 +177,7 @@ static int vfio_map_irq_region(struct fslmc_vfio_group *group)
 		.size = 0x1000,
 	};
 
-	vaddr = (unsigned long *)mmap(NULL, 0x1000, PROT_WRITE |
+	vaddr = (unsigned long *)scone_kernel_mmap(NULL, 0x1000, PROT_WRITE |
 		PROT_READ, MAP_SHARED, container_device_fd, 0x6030000);
 	if (vaddr == MAP_FAILED) {
 		FSLMC_VFIO_LOG(ERR, "Unable to map region (errno = %d)", errno);
@@ -301,7 +302,7 @@ static int64_t vfio_map_mcp_obj(struct fslmc_vfio_group *group, char *mcp_obj)
 	FSLMC_VFIO_LOG(DEBUG, "region offset = %llx  , region size = %llx",
 		       reg_info.offset, reg_info.size);
 
-	v_addr = (uint64_t)mmap(NULL, reg_info.size,
+	v_addr = (uint64_t)scone_kernel_mmap(NULL, reg_info.size,
 		PROT_WRITE | PROT_READ, MAP_SHARED,
 		mc_fd, reg_info.offset);
 

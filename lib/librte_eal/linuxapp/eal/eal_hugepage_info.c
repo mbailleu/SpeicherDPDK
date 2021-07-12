@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/queue.h>
+#include <fcntl.h>
 
 #include <rte_memory.h>
 #include <rte_eal.h>

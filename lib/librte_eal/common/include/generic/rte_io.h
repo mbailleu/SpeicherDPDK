@@ -245,10 +245,13 @@ rte_read16_relaxed(const volatile void *addr)
 	return *(const volatile uint16_t *)addr;
 }
 
+#include <stdio.h>
+
 static __rte_always_inline uint32_t
 rte_read32_relaxed(const volatile void *addr)
 {
-	return *(const volatile uint32_t *)addr;
+  uint32_t res = *(const volatile uint32_t *)addr;
+  return res;
 }
 
 static __rte_always_inline uint64_t

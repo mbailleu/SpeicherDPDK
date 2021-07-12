@@ -23,6 +23,8 @@
 #include "vhost.h"
 #include "vhost_user.h"
 
+#include "scone.h"
+
 #define VIRTIO_MIN_MTU 68
 #define VIRTIO_MAX_MTU 65535
 
@@ -714,7 +716,7 @@ vhost_user_set_mem_table(struct virtio_net *dev, struct VhostUserMsg *pmsg)
 		}
 		mmap_size = RTE_ALIGN_CEIL(mmap_size, alignment);
 
-		mmap_addr = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,
+		mmap_addr = scone_kernel_mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,
 				 MAP_SHARED | MAP_POPULATE, fd, 0);
 
 		if (mmap_addr == MAP_FAILED) {
@@ -991,7 +993,7 @@ vhost_user_set_log_base(struct virtio_net *dev, struct VhostUserMsg *msg)
 	 * mmap from 0 to workaround a hugepage mmap bug: mmap will
 	 * fail when offset is not page size aligned.
 	 */
-	addr = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	addr = scone_kernel_mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	close(fd);
 	if (addr == MAP_FAILED) {
 		RTE_LOG(ERR, VHOST_CONFIG, "mmap log base failed!\n");

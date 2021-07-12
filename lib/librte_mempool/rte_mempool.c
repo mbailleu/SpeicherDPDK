@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <sys/queue.h>
 #include <sys/mman.h>
+#include <fcntl.h>
 
 #include <rte_common.h>
 #include <rte_log.h>
@@ -31,6 +32,7 @@
 #include <rte_spinlock.h>
 
 #include "rte_mempool.h"
+#include "scone.h"
 
 TAILQ_HEAD(rte_mempool_list, rte_tailq_entry);
 
@@ -663,12 +665,18 @@ rte_mempool_populate_anon(struct rte_mempool *mp)
 
 	/* get chunk of virtually continuous memory */
 	size = get_anon_size(mp);
-	addr = mmap(NULL, size, PROT_READ | PROT_WRITE,
-		MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	int fd = open("/dev/zero", O_RDWR);
+	if (fd < 0) {
+	  RTE_LOG(INFO, MEMPOOL, "%s(): could not open /dev/zero\n", __func__);
+  }
+	addr = scone_kernel_mmap(NULL, size, PROT_READ | PROT_WRITE,
+		MAP_SHARED | MAP_ANONYMOUS, fd, 0);
 	if (addr == MAP_FAILED) {
 		rte_errno = errno;
+	  close(fd);
 		return 0;
 	}
+	close(fd);
 	/* can't use MMAP_LOCKED, it does not exist on BSD */
 	if (mlock(addr, size) < 0) {
 		rte_errno = errno;

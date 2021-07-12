@@ -12,7 +12,7 @@
 # examples for RTE_EXEC_ENV: linuxapp, bsdapp
 #
 ifeq ($(CONFIG_RTE_BUILD_SHARED_LIB),y)
-EXECENV_CFLAGS  = -pthread -fPIC
+EXECENV_CFLAGS  = -pthread
 else
 EXECENV_CFLAGS  = -pthread
 endif

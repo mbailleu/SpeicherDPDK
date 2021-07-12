@@ -22,6 +22,7 @@
 
 #include "pci_init.h"
 #include "private.h"
+#include "scone.h"
 
 /**
  * @file
@@ -377,7 +378,7 @@ pci_vfio_mmap_bar(int vfio_dev_fd, struct mapped_pci_resource *vfio_res,
 	}
 
 	/* reserve the address using an inaccessible mapping */
-	bar_addr = mmap(bar->addr, bar->size, 0, MAP_PRIVATE |
+	bar_addr = scone_kernel_mmap(bar->addr, bar->size, 0, MAP_PRIVATE |
 			MAP_ANONYMOUS | additional_flags, -1, 0);
 	if (bar_addr != MAP_FAILED) {
 		void *map_addr = NULL;

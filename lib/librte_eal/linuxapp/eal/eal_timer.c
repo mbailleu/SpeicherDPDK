@@ -25,6 +25,7 @@
 
 #include "eal_private.h"
 #include "eal_internal_cfg.h"
+#include "scone.h"
 
 enum timer_source eal_timer_source = EAL_TIMER_HPET;
 
@@ -151,7 +152,7 @@ rte_eal_hpet_init(int make_default)
 		internal_config.no_hpet = 1;
 		return -1;
 	}
-	eal_hpet = mmap(NULL, 1024, PROT_READ, MAP_SHARED, fd, 0);
+	eal_hpet = scone_kernel_mmap(NULL, 1024, PROT_READ, MAP_SHARED, fd, 0);
 	if (eal_hpet == MAP_FAILED) {
 		RTE_LOG(ERR, EAL, "ERROR: Cannot mmap "DEV_HPET"!\n"
 				"Please enable CONFIG_HPET_MMAP in your kernel configuration "

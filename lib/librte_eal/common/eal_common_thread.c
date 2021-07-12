@@ -68,6 +68,7 @@ int eal_cpuset_socket_id(rte_cpuset_t *cpusetp)
 int
 rte_thread_set_affinity(rte_cpuset_t *cpusetp)
 {
+#if 0
 	int s;
 	unsigned lcore_id;
 	pthread_t tid;
@@ -95,7 +96,7 @@ rte_thread_set_affinity(rte_cpuset_t *cpusetp)
 		memmove(&lcore_config[lcore_id].cpuset, cpusetp,
 			sizeof(rte_cpuset_t));
 	}
-
+#endif
 	return 0;
 }
 

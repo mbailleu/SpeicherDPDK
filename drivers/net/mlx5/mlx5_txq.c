@@ -33,6 +33,8 @@
 #include "mlx5_autoconf.h"
 #include "mlx5_glue.h"
 
+#include "scone.h"
+
 /**
  * Allocate TX queue elements.
  *
@@ -319,7 +321,7 @@ priv_tx_uar_remap(struct priv *priv, int fd)
 			/* fixed mmap to specified address in reserved
 			 * address space.
 			 */
-			ret = mmap(addr, page_size,
+			ret = scone_kernel_mmap(addr, page_size,
 				   PROT_WRITE, MAP_FIXED | MAP_SHARED, fd,
 				   txq_ctrl->uar_mmap_offset);
 			if (ret != addr) {

@@ -69,6 +69,7 @@ rte_eal_remote_launch(int (*f)(void *), void *arg, unsigned slave_id)
 static int
 eal_thread_set_affinity(void)
 {
+#if 0
 	unsigned lcore_id = rte_lcore_id();
 
 	/* acquire system unique id  */
@@ -76,6 +77,8 @@ eal_thread_set_affinity(void)
 
 	/* update EAL thread core affinity */
 	return rte_thread_set_affinity(&lcore_config[lcore_id].cpuset);
+#endif
+  return 0;
 }
 
 void eal_thread_init_master(unsigned lcore_id)

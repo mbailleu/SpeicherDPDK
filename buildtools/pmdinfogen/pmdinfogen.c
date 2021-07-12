@@ -73,17 +73,24 @@ static void *grab_file(const char *filename, unsigned long *size)
 		}
 	}
 
-	if (fstat(fd, &st))
-		goto failed;
+  if (0) {
+	  if (fstat(fd, &st))
+		  goto failed;
+  } else {
+    *size = lseek(fd, 0, SEEK_END) + 1;
+  }
 
-	*size = st.st_size;
-	map = mmap(NULL, *size, PROT_READ|PROT_WRITE, MAP_PRIVATE, fd, 0);
+//	*size = st.st_size;
+	map = mmap(NULL, *size, PROT_READ, MAP_PRIVATE, fd, 0);
 
 failed:
 	close(fd);
 	if (map == MAP_FAILED)
 		return NULL;
-	return map;
+	char * res = malloc(*size);
+	memcpy(res, map, *size);
+	munmap(map, *size);
+	return res;
 }
 
 /**

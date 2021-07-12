@@ -56,6 +56,7 @@
 #include "eal_hugepages.h"
 #include "eal_options.h"
 #include "eal_vfio.h"
+#include "scone.h"
 
 #define MEMSIZE_IF_NO_HUGE_PAGE (64ULL * 1024ULL * 1024ULL)
 
@@ -198,7 +199,7 @@ rte_eal_config_create(void)
 				"process running?\n", pathname);
 	}
 
-	rte_mem_cfg_addr = mmap(rte_mem_cfg_addr, sizeof(*rte_config.mem_config),
+	rte_mem_cfg_addr = scone_kernel_mmap(rte_mem_cfg_addr, sizeof(*rte_config.mem_config),
 				PROT_READ | PROT_WRITE, MAP_SHARED, mem_cfg_fd, 0);
 
 	if (rte_mem_cfg_addr == MAP_FAILED){
@@ -231,7 +232,7 @@ rte_eal_config_attach(void)
 	}
 
 	/* map it as read-only first */
-	mem_config = (struct rte_mem_config *) mmap(NULL, sizeof(*mem_config),
+	mem_config = (struct rte_mem_config *) scone_kernel_mmap(NULL, sizeof(*mem_config),
 			PROT_READ, MAP_SHARED, mem_cfg_fd, 0);
 	if (mem_config == MAP_FAILED)
 		rte_panic("Cannot mmap memory for rte_config! error %i (%s)\n",
@@ -257,7 +258,7 @@ rte_eal_config_reattach(void)
 	munmap(rte_config.mem_config, sizeof(struct rte_mem_config));
 
 	/* remap the config at proper address */
-	mem_config = (struct rte_mem_config *) mmap(rte_mem_cfg_addr,
+	mem_config = (struct rte_mem_config *) scone_kernel_mmap(rte_mem_cfg_addr,
 			sizeof(*mem_config), PROT_READ | PROT_WRITE, MAP_SHARED,
 			mem_cfg_fd, 0);
 	if (mem_config == MAP_FAILED || mem_config != rte_mem_cfg_addr) {

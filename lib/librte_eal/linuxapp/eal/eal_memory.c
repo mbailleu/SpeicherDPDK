@@ -28,6 +28,8 @@
 #include <numaif.h>
 #endif
 
+#include <fcntl.h>
+
 #include <rte_log.h>
 #include <rte_memory.h>
 #include <rte_launch.h>
@@ -42,6 +44,7 @@
 #include "eal_internal_cfg.h"
 #include "eal_filesystem.h"
 #include "eal_hugepages.h"
+#include "scone.h"
 
 #define PFN_MASK_SIZE	8
 
@@ -273,7 +276,7 @@ get_virtual_area(size_t *size, size_t hugepage_sz)
 		return NULL;
 	}
 	do {
-		addr = mmap(addr_hint, (*size) + hugepage_sz, PROT_READ,
+		addr = scone_kernel_mmap(addr_hint, (*size) + hugepage_sz, PROT_READ,
 #ifdef RTE_ARCH_PPC_64
 				MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB,
 #else
@@ -479,7 +482,7 @@ map_all_hugepages(struct hugepage_file *hugepg_tbl, struct hugepage_info *hpi,
 
 		/* map the segment, and populate page tables,
 		 * the kernel fills this segment with zeros */
-		virtaddr = mmap(vma_addr, hugepage_sz, PROT_READ | PROT_WRITE,
+		virtaddr = scone_kernel_mmap(vma_addr, hugepage_sz, PROT_READ | PROT_WRITE,
 				MAP_SHARED | MAP_POPULATE, fd, 0);
 		if (virtaddr == MAP_FAILED) {
 			RTE_LOG(DEBUG, EAL, "%s(): mmap failed: %s\n", __func__,
@@ -689,7 +692,7 @@ create_shared_memory(const char *filename, const size_t mem_size)
 		close(fd);
 		return NULL;
 	}
-	retval = mmap(NULL, mem_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	retval = scone_kernel_mmap(NULL, mem_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	close(fd);
 	if (retval == MAP_FAILED)
 		return NULL;
@@ -1031,8 +1034,10 @@ rte_eal_hugepage_init(void)
 
 	/* hugetlbfs can be disabled */
 	if (internal_config.no_hugetlbfs) {
-		addr = mmap(NULL, internal_config.memory, PROT_READ | PROT_WRITE,
-				MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
+	  int fd = open("/dev/zero", O_RDWR);
+		addr = scone_kernel_mmap(NULL, internal_config.memory, PROT_READ | PROT_WRITE,
+				MAP_PRIVATE | MAP_ANONYMOUS, fd, 0);
+		close(fd);
 		if (addr == MAP_FAILED) {
 			RTE_LOG(ERR, EAL, "%s: mmap() failed: %s\n", __func__,
 					strerror(errno));
@@ -1400,7 +1405,7 @@ rte_eal_hugepage_attach(void)
 		 * addresses of the appropriate memseg size.
 		 * use mmap to get identical addresses as the primary process.
 		 */
-		base_addr = mmap(mcfg->memseg[s].addr, mcfg->memseg[s].len,
+		base_addr = scone_kernel_mmap(mcfg->memseg[s].addr, mcfg->memseg[s].len,
 				 PROT_READ,
 #ifdef RTE_ARCH_PPC_64
 				 MAP_PRIVATE | MAP_ANONYMOUS | MAP_HUGETLB,
@@ -1436,7 +1441,7 @@ rte_eal_hugepage_attach(void)
 	}
 
 	size = getFileSize(fd_hugepage);
-	hp = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd_hugepage, 0);
+	hp = scone_kernel_mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd_hugepage, 0);
 	if (hp == MAP_FAILED) {
 		RTE_LOG(ERR, EAL, "Could not mmap %s\n", eal_hugepage_info_path());
 		goto error;
@@ -1469,7 +1474,7 @@ rte_eal_hugepage_attach(void)
 					goto error;
 				}
 				mapping_size = hp[i].size;
-				addr = mmap(RTE_PTR_ADD(base_addr, offset),
+				addr = scone_kernel_mmap(RTE_PTR_ADD(base_addr, offset),
 						mapping_size, PROT_READ | PROT_WRITE,
 						MAP_SHARED, fd, 0);
 				close(fd); /* close file both on success and on failure */

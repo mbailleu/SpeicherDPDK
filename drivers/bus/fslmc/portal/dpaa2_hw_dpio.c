@@ -38,6 +38,8 @@
 #include "dpaa2_hw_dpio.h"
 #include <mc/fsl_dpmng.h>
 
+#include "scone.h"
+
 #define NUM_HOST_CPUS RTE_MAX_LCORE
 
 struct dpaa2_io_portal_t dpaa2_io_portal[RTE_MAX_LCORE];
@@ -427,7 +429,7 @@ dpaa2_create_dpio_device(int vdev_fd,
 	}
 
 	dpio_dev->ce_size = reg_info.size;
-	dpio_dev->qbman_portal_ce_paddr = (uint64_t)mmap(NULL, reg_info.size,
+	dpio_dev->qbman_portal_ce_paddr = (uint64_t)scone_kernel_mmap(NULL, reg_info.size,
 				PROT_WRITE | PROT_READ, MAP_SHARED,
 				vdev_fd, reg_info.offset);
 
@@ -439,7 +441,7 @@ dpaa2_create_dpio_device(int vdev_fd,
 	}
 
 	dpio_dev->ci_size = reg_info.size;
-	dpio_dev->qbman_portal_ci_paddr = (uint64_t)mmap(NULL, reg_info.size,
+	dpio_dev->qbman_portal_ci_paddr = (uint64_t)scone_kernel_mmap(NULL, reg_info.size,
 				PROT_WRITE | PROT_READ, MAP_SHARED,
 				vdev_fd, reg_info.offset);
 
